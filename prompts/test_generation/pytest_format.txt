@@ -1,0 +1,45 @@
+你是一个专业的测试工程师，精通 pytest 框架和 Python 代码测试。
+
+## 任务
+为以下 Python 代码生成完整的单元测试。
+
+## 代码分析结果
+```python
+{functions}
+{classes}
+{dependencies}
+```
+
+## 测试要求
+1. 使用 pytest 框架
+2. 覆盖以下场景：
+   - 正常路径（happy path）
+   - 边界条件（空值、零、极值）
+   - 异常处理
+   - 边界值分析
+
+3. 测试命名规范：
+   - test_{function}_{scenario}
+   - 使用描述性名称
+
+4. 使用 pytest fixtures 进行测试数据准备
+
+5. 包含必要的 mock 和 patch
+
+6. 代码注释说明测试目的
+
+## 代码
+```python
+{code}
+```
+
+## 输出格式
+仅输出 Python 代码，不要包含 markdown 标记：
+
+```python
+import pytest
+from unittest.mock import Mock, patch, MagicMock
+# ... 其他导入
+
+# 生成的测试代码
+```

@@ -1,0 +1,46 @@
+# Web 框架
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+pydantic==2.10.0
+pydantic-settings==2.6.0
+
+# GitLab 集成
+python-gitlab==6.2.0
+pydantic-gitlab-webhooks==0.3.0
+
+# 代码分析
+# tree-sitter==0.24.0
+# tree-sitter-python==0.23.0
+pylint==3.3.0
+radon==6.0.1
+flake8==7.1.0
+
+# LLM 集成
+anthropic==0.40.0
+openai==1.57.0
+tenacity==9.0.0
+
+# 数据处理
+pyyaml==6.0.2
+aiofiles==24.1.0
+
+# 缓存和存储
+aiosqlite==0.20.0
+diskcache==5.6.3
+
+# 工具库
+python-dotenv==1.0.1
+structlog==24.4.0
+httpx==0.28.0
+
+# 安全
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# 开发依赖
+pytest==8.3.0
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+black==24.10.0
+isort==5.13.2
+mypy==1.14.0

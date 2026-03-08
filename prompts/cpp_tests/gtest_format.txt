@@ -1,0 +1,131 @@
+你是一个专业的 C++ 测试工程师，精通 Google Test (gtest) 框架和现代 C++ (C++11/14/17/20)。
+
+## 任务
+为以下 C++ 代码生成完整的单元测试。
+
+## 代码分析结果
+
+### 类定义
+{classes}
+
+### 函数列表
+{functions}
+
+### 包含头文件
+{includes}
+
+### 语言特性
+- C++ 版本：{cpp_version}
+- QT 项目：{is_qt_project}
+- QT 模块：{qt_modules}
+
+## 测试要求
+1. 使用 Google Test (gtest) 框架
+2. 为每个公共方法生成测试用例
+3. 覆盖以下场景：
+   - 正常路径（happy path）
+   - 边界条件（0、负数、极值、空值）
+   - 异常处理（std::exception, 自定义异常）
+   - 边界值分析
+   - 内存安全（指针、引用）
+
+4. 测试命名规范：
+   - `TEST_F(ClassName, MethodName_Scenario)`
+   - 使用描述性名称，例如：`TEST_F(CalculatorTest, AddTwoPositiveNumbers_ReturnsCorrectSum)`
+
+5. 使用 Google Test 断言：
+   - `EXPECT_EQ`, `ASSERT_EQ` - 相等性
+   - `EXPECT_NE`, `ASSERT_NE` - 不等性
+   - `EXPECT_TRUE`, `ASSERT_TRUE` - 布尔值
+   - `EXPECT_FALSE`, `ASSERT_FALSE` - 布尔值
+   - `EXPECT_THROW`, `ASSERT_THROW` - 异常
+   - `EXPECT_ANY_THROW`, `ASSERT_ANY_THROW` - 任意异常
+   - `EXPECT_NEAR`, `ASSERT_NEAR` - 浮点数比较
+
+6. 使用测试固件（Test Fixture）：
+   ```cpp
+   class ClassNameTest : public ::testing::Test {{
+   protected:
+       ClassNameTest() {{}}
+       ~ClassNameTest() override {{}}
+
+       void SetUp() override {{{{
+           // 测试前初始化
+       }}}}
+
+       void TearDown() override {{{{
+           // 测试后清理
+       }}}}
+
+       // 测试数据成员
+       ClassName obj;
+   }};
+   ```
+
+7. 如果是 QT 项目：
+   - 初始化 QT 应用（QCoreApplication 或 QApplication）
+   - 使用 QTest 相关宏（如果需要）
+   - 测试信号槽（如果需要）
+
+8. 包含必要的头文件和 mock（如果需要）
+
+## 源代码
+```cpp
+{source_code}
+```
+
+## 输出格式
+仅输出 C++ 代码，不要包含 markdown 标记：
+
+```cpp
+#include <gtest/gtest.h>
+#include "your_header.h"
+
+// 如果是 QT 项目
+// #include <QCoreApplication>
+// #include <QDebug>
+
+// 测试固件
+class YourClassTest : public ::testing::Test {{
+protected:
+    YourClassTest() {{}}
+    ~YourClassTest() override {{}}
+
+    void SetUp() override {{{{
+        // 初始化
+    }}}}
+
+    void TearDown() override {{{{
+        // 清理
+    }}}}
+
+    // 测试对象
+    YourClass obj;
+}};
+
+// 测试用例
+TEST_F(YourClassTest, MethodName_Scenario) {{{{
+    // Arrange
+    // 设置测试数据
+
+    // Act
+    // 执行被测试方法
+
+    // Assert
+    // 验证结果
+    EXPECT_EQ(expected, actual);
+}}}}
+
+// 主函数（如果需要）
+// int main(int argc, char** argv) {{{{
+//     ::testing::InitGoogleTest(&argc, argv);
+//     return RUN_ALL_TESTS();
+// }}}}
+```
+
+## 注意事项
+- 确保测试代码能够编译通过
+- 使用现代 C++ 特性（智能指针、STL 容器等）
+- 避免使用已弃用的特性
+- 如果测试需要 QT 事件循环，适当处理
+- 添加必要的注释说明测试目的

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  ai-cicd:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-cicd
+    ports:
+      - "8000:8000"
+    environment:
+      # LLM 配置
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-3-5-sonnet-20241022}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+
+      # GitLab 配置
+      - GITLAB_URL=${GITLAB_URL:-https://gitlab.com}
+      - GITLAB_TOKEN=${GITLAB_TOKEN}
+      - GITLAB_WEBHOOK_SECRET=${GITLAB_WEBHOOK_SECRET}
+
+      # 服务配置
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - WORKERS=${WORKERS:-4}
+
+      # 日志配置
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+
+      # 环境配置
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+
+      # 缓存配置
+      - CACHE_TTL=${CACHE_TTL:-3600}
+
+      # 数据库配置
+      - DATABASE_URL=sqlite:///./data/ai_cicd.db
+
+      # 限流配置
+      - MAX_REQUESTS_PER_MINUTE=${MAX_REQUESTS_PER_MINUTE:-60}
+      - MAX_CONCURRENT_REVIEWS=${MAX_CONCURRENT_REVIEWS:-5}
+
+      # 成本控制
+      - DAILY_TOKEN_BUDGET=${DAILY_TOKEN_BUDGET:-1000000}
+      - ENABLE_COST_TRACKING=${ENABLE_COST_TRACKING:-true}
+
+      # 功能开关
+      - ENABLE_TEST_GENERATION=${ENABLE_TEST_GENERATION:-true}
+      - ENABLE_CODE_REVIEW=${ENABLE_CODE_REVIEW:-true}
+      - ENABLE_PIPELINE_GENERATION=${ENABLE_PIPELINE_GENERATION:-false}
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  data:
+  logs:

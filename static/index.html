@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-CICD Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <!-- 头部 -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="header-title">AI-CICD Dashboard</h1>
+            <div class="header-status">
+                <span class="status-label">实时:</span>
+                <span id="connection-status" class="status-indicator connecting">●</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 统计卡片 -->
+        <section class="stats-cards">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">测试统计</h3>
+                    <span class="stat-icon">🧪</span>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="tests-generated">0</div>
+                    <div class="stat-label">已生成测试</div>
+                </div>
+                <div class="stat-footer">
+                    <div class="stat-metric">
+                        <span class="metric-label">通过率</span>
+                        <span class="metric-value" id="tests-pass-rate">0%</span>
+                    </div>
+                    <div class="stat-metric">
+                        <span class="metric-label">覆盖率</span>
+                        <span class="metric-value" id="tests-coverage">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">代码审查</h3>
+                    <span class="stat-icon">🔍</span>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="reviews-total">0</div>
+                    <div class="stat-label">已审查 MR</div>
+                </div>
+                <div class="stat-footer">
+                    <div class="stat-metric">
+                        <span class="metric-label">平均分</span>
+                        <span class="metric-value" id="reviews-avg-score">0</span>
+                    </div>
+                    <div class="stat-metric">
+                        <span class="metric-label">发现问题</span>
+                        <span class="metric-value" id="reviews-issues">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">MR 监控</h3>
+                    <span class="stat-icon">🔄</span>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="mr-processed">0</div>
+                    <div class="stat-label">已处理 MR</div>
+                </div>
+                <div class="stat-footer">
+                    <div class="stat-metric">
+                        <span class="metric-label">待处理</span>
+                        <span class="metric-value" id="mr-pending">0</span>
+                    </div>
+                    <div class="stat-metric">
+                        <span class="metric-label">平均时间</span>
+                        <span class="metric-value" id="mr-avg-time">0s</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <h3 class="stat-title">LLM 统计</h3>
+                    <span class="stat-icon">🤖</span>
+                </div>
+                <div class="stat-body">
+                    <div class="stat-value" id="llm-tokens">0</div>
+                    <div class="stat-label">Token 使用量</div>
+                </div>
+                <div class="stat-footer">
+                    <div class="stat-metric">
+                        <span class="metric-label">API 调用</span>
+                        <span class="metric-value" id="llm-api-calls">0</span>
+                    </div>
+                    <div class="stat-metric">
+                        <span class="metric-label">成本</span>
+                        <span class="metric-value" id="llm-cost">$0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 图表区域 -->
+        <section class="charts-section">
+            <!-- 测试通过率趋势图 -->
+            <div class="chart-container full-width">
+                <h3 class="chart-title">测试通过率趋势 (24小时)</h3>
+                <canvas id="test-trend-chart"></canvas>
+            </div>
+
+            <div class="chart-row">
+                <!-- 问题分布图 -->
+                <div class="chart-container half-width">
+                    <h3 class="chart-title">问题分布</h3>
+                    <canvas id="issue-distribution-chart"></canvas>
+                </div>
+
+                <!-- LLM 使用统计图 -->
+                <div class="chart-container half-width">
+                    <h3 class="chart-title">LLM 使用统计</h3>
+                    <canvas id="llm-usage-chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- 最近活动流 -->
+        <section class="activity-section">
+            <h3 class="section-title">最近活动</h3>
+            <div class="activity-list" id="activity-list">
+                <div class="activity-item">
+                    <span class="activity-time">--:--</span>
+                    <span class="activity-message">等待活动数据...</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 脚本引入 -->
+    <script src="/static/vendor/chart.min.js"></script>
+    <script src="/static/js/api-client.js"></script>
+    <script src="/static/js/websocket-client.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
