@@ -1,0 +1,47 @@
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-cicd-config
+  namespace: ai-cicd
+data:
+  # Environment configuration
+  ENVIRONMENT: "production"
+
+  # API configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  WORKERS: "4"
+
+  # Logging configuration
+  LOG_LEVEL: "INFO"
+  LOG_FORMAT: "json"
+
+  # Cache configuration
+  CACHE_TTL: "3600"
+
+  # Database pool configuration
+  DATABASE_POOL_SIZE: "20"
+  DATABASE_MAX_OVERFLOW: "40"
+  DB_ECHO: "false"
+
+  # Redis configuration
+  REDIS_MAX_CONNECTIONS: "100"
+  REDIS_SOCKET_TIMEOUT: "5"
+  REDIS_SOCKET_CONNECT_TIMEOUT: "5"
+
+  # RabbitMQ configuration
+  RABBITMQ_EXCHANGE: "ai_cicd"
+
+  # Rate limiting
+  MAX_REQUESTS_PER_MINUTE: "120"
+  MAX_CONCURRENT_REVIEWS: "10"
+
+  # Cost control
+  DAILY_TOKEN_BUDGET: "5000000"
+  ENABLE_COST_TRACKING: "true"
+
+  # Feature flags
+  ENABLE_TEST_GENERATION: "true"
+  ENABLE_CODE_REVIEW: "true"
+  ENABLE_PIPELINE_GENERATION: "true"

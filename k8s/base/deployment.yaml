@@ -1,0 +1,392 @@
+# AI-CICD API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-cicd-api
+  namespace: ai-cicd
+  labels:
+    app: ai-cicd
+    component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ai-cicd
+      component: api
+  template:
+    metadata:
+      labels:
+        app: ai-cicd
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: api
+          image: ai-cicd:latest # Replace with your actual image
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+              protocol: TCP
+          env:
+            # Environment from ConfigMap
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENVIRONMENT
+            - name: API_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: API_HOST
+            - name: API_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: API_PORT
+            - name: WORKERS
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: WORKERS
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: LOG_LEVEL
+            - name: LOG_FORMAT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: LOG_FORMAT
+            - name: CACHE_TTL
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: CACHE_TTL
+            - name: DATABASE_POOL_SIZE
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: DATABASE_POOL_SIZE
+            - name: DATABASE_MAX_OVERFLOW
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: DATABASE_MAX_OVERFLOW
+            - name: DB_ECHO
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: DB_ECHO
+            - name: REDIS_MAX_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: REDIS_MAX_CONNECTIONS
+            - name: REDIS_SOCKET_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: REDIS_SOCKET_TIMEOUT
+            - name: REDIS_SOCKET_CONNECT_TIMEOUT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: REDIS_SOCKET_CONNECT_TIMEOUT
+            - name: RABBITMQ_EXCHANGE
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: RABBITMQ_EXCHANGE
+            - name: MAX_REQUESTS_PER_MINUTE
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: MAX_REQUESTS_PER_MINUTE
+            - name: MAX_CONCURRENT_REVIEWS
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: MAX_CONCURRENT_REVIEWS
+            - name: DAILY_TOKEN_BUDGET
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: DAILY_TOKEN_BUDGET
+            - name: ENABLE_COST_TRACKING
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENABLE_COST_TRACKING
+            - name: ENABLE_TEST_GENERATION
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENABLE_TEST_GENERATION
+            - name: ENABLE_CODE_REVIEW
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENABLE_CODE_REVIEW
+            - name: ENABLE_PIPELINE_GENERATION
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENABLE_PIPELINE_GENERATION
+
+            # Secrets
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: ANTHROPIC_API_KEY
+            - name: CLAUDE_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: CLAUDE_MODEL
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: OPENAI_API_KEY
+            - name: ZHIPU_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: ZHIPU_API_KEY
+            - name: ZHIPU_MODEL
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: ZHIPU_MODEL
+            - name: DEFAULT_LLM_PROVIDER
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: DEFAULT_LLM_PROVIDER
+            - name: GITLAB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: GITLAB_URL
+            - name: GITLAB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: GITLAB_TOKEN
+            - name: GITLAB_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: GITLAB_WEBHOOK_SECRET
+
+            # Database URL (constructed from secrets)
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_DB
+
+            # Redis URL (constructed from secrets)
+            - name: REDIS_URL
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/0"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: REDIS_PASSWORD
+
+            # RabbitMQ URL (constructed from secrets)
+            - name: RABBITMQ_URL
+              value: "amqp://$(RABBITMQ_USER):$(RABBITMQ_PASSWORD)@rabbitmq:5672/$(RABBITMQ_VHOST)"
+            - name: RABBITMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: RABBITMQ_PASSWORD
+            - name: RABBITMQ_VHOST
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: RABBITMQ_VHOST
+
+            # Celery configuration
+            - name: CELERY_BROKER_URL
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/1"
+            - name: CELERY_RESULT_BACKEND
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/2"
+
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+
+---
+# AI-CICD Celery Worker Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-cicd-worker
+  namespace: ai-cicd
+  labels:
+    app: ai-cicd
+    component: worker
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: ai-cicd
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: ai-cicd
+        component: worker
+    spec:
+      containers:
+        - name: worker
+          image: ai-cicd:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - celery
+            - -A
+            - src.tasks.celery_app
+            - worker
+            - --loglevel=info
+            - --queues=build,test,analysis,notification
+            - --concurrency=4
+          env:
+            # Include all environment variables from API deployment
+            # (Same as above - abbreviated for brevity)
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: ENVIRONMENT
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: ai-cicd-config
+                  key: LOG_LEVEL
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: POSTGRES_DB
+            - name: REDIS_URL
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/0"
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: REDIS_PASSWORD
+            - name: CELERY_BROKER_URL
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/1"
+            - name: CELERY_RESULT_BACKEND
+              value: "redis://:$(REDIS_PASSWORD)@redis:6379/2"
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: ANTHROPIC_API_KEY
+            - name: ZHIPU_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: ZHIPU_API_KEY
+            - name: GITLAB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: GITLAB_URL
+            - name: GITLAB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: ai-cicd-secrets
+                  key: GITLAB_TOKEN
+
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
+
+          livenessProbe:
+            exec:
+              command:
+                - celery
+                - -A
+                - src.tasks.celery_app
+                - inspect
+                - ping
+            initialDelaySeconds: 60
+            periodSeconds: 30
+
+          readinessProbe:
+            exec:
+              command:
+                - celery
+                - -A
+                - src.tasks.celery_app
+                - inspect
+                - ping
+            initialDelaySeconds: 30
+            periodSeconds: 10

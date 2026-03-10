@@ -1,0 +1,27 @@
+# Kustomization for base resources
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: ai-cicd
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - postgres.yaml
+  - redis.yaml
+  - rabbitmq.yaml
+  - deployment.yaml
+  - service.yaml
+  - hpa.yaml
+
+# Secret generator (for development only - do NOT use in production)
+secretGenerator:
+  - name: ai-cicd-secrets-dev
+    literals:
+      - ANTHROPIC_API_KEY=dev_key_replace_me
+      - ZHIPU_API_KEY=dev_key_replace_me
+      - GITLAB_TOKEN=dev_token_replace_me
+      - GITLAB_WEBHOOK_SECRET=dev_secret_replace_me
+      - POSTGRES_PASSWORD=dev_password_replace_me
+      - REDIS_PASSWORD=dev_password_replace_me
+      - RABBITMQ_PASSWORD=dev_password_replace_me

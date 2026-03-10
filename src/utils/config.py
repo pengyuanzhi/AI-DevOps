@@ -44,6 +44,21 @@ class Settings(BaseSettings):
 
     # 数据库配置
     database_url: str = Field(default="sqlite:///./data/ai_cicd.db", env="DATABASE_URL")
+    database_pool_size: int = Field(default=10, env="DATABASE_POOL_SIZE")
+    database_max_overflow: int = Field(default=20, env="DATABASE_MAX_OVERFLOW")
+    db_echo: bool = Field(default=False, env="DB_ECHO")
+
+    # Redis 配置
+    redis_url: str = Field(default="redis://localhost:6379/0", env="REDIS_URL")
+    redis_max_connections: int = Field(default=50, env="REDIS_MAX_CONNECTIONS")
+    redis_socket_timeout: int = Field(default=5, env="REDIS_SOCKET_TIMEOUT")
+    redis_socket_connect_timeout: int = Field(default=5, env="REDIS_SOCKET_CONNECT_TIMEOUT")
+
+    # RabbitMQ 配置
+    rabbitmq_url: str = Field(default="amqp://guest:guest@localhost:5672/", env="RABBITMQ_URL")
+    rabbitmq_exchange: str = Field(default="ai_cicd", env="RABBITMQ_EXCHANGE")
+    celery_broker_url: str = Field(default="redis://localhost:6379/1", env="CELERY_BROKER_URL")
+    celery_result_backend: str = Field(default="redis://localhost:6379/2", env="CELERY_RESULT_BACKEND")
 
     # 限流配置
     max_requests_per_minute: int = Field(default=60, env="MAX_REQUESTS_PER_MINUTE")
@@ -57,6 +72,9 @@ class Settings(BaseSettings):
     enable_test_generation: bool = Field(default=True, env="ENABLE_TEST_GENERATION")
     enable_code_review: bool = Field(default=True, env="ENABLE_CODE_REVIEW")
     enable_pipeline_generation: bool = Field(default=False, env="ENABLE_PIPELINE_GENERATION")
+
+    # 调试模式
+    debug: bool = Field(default=False, env="DEBUG")
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -10,10 +10,10 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
 
 from src.api.middleware.auth import GitLabWebhookAuthMiddleware
 from src.api.routes import cicd, dashboard, webhooks
+from src.api.v1 import api_router
 from src.utils.config import settings
 from src.utils.logger import get_logger, setup_logging
 
@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     应用生命周期管理
 
-    启动时创建必要的目录和资源
+    启动时创建必要的目录和资源，初始化数据库
     关闭时清理资源
     """
     # 启动时执行
@@ -48,10 +48,37 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         tests_dir=str(settings.generated_tests_dir),
     )
 
+    # 初始化数据库连接池
+    from src.db.session import get_async_engine
+    try:
+        engine = get_async_engine()
+        logger.info(
+            "database_connection_initialized",
+            database_url=settings.database_url.split("@")[-1] if "@" in settings.database_url else "local",
+        )
+    except Exception as e:
+        logger.error(
+            "database_initialization_failed",
+            error=str(e),
+        )
+        raise
+
     yield
 
     # 关闭时执行
     logger.info("shutting_down_ai_cicd")
+
+    # 关闭数据库连接
+    try:
+        from src.db.session import get_async_engine
+        engine = get_async_engine()
+        await engine.dispose()
+        logger.info("database_connections_closed")
+    except Exception as e:
+        logger.warning(
+            "database_cleanup_failed",
+            error=str(e),
+        )
 
 
 # 创建 FastAPI 应用
@@ -87,17 +114,10 @@ app = FastAPI(
 app.add_middleware(GitLabWebhookAuthMiddleware)
 
 # 注册路由
+app.include_router(api_router)
 app.include_router(cicd.router)
 app.include_router(webhooks.router)
 app.include_router(dashboard.router)
-
-# 挂载静态文件目录
-static_dir = Path(__file__).parent.parent / "static"
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-    logger.info("static_files_mounted", path=str(static_dir))
-else:
-    logger.warning("static_directory_not_found", path=str(static_dir))
 
 
 @app.get("/health", tags=["健康检查"])

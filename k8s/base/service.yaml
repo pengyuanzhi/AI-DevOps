@@ -1,0 +1,51 @@
+# API Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-cicd-api
+  namespace: ai-cicd
+  labels:
+    app: ai-cicd
+    component: api
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: ai-cicd
+    component: api
+
+---
+# Ingress for API
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-cicd-ingress
+  namespace: ai-cicd
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Optional, for TLS
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - ai-cicd.example.com # Replace with your actual domain
+      secretName: ai-cicd-tls
+  rules:
+    - host: ai-cicd.example.com # Replace with your actual domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-cicd-api
+                port:
+                  number: 80
